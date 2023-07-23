@@ -1,4 +1,4 @@
-name: dev branch auto ci process script
+name: main branch auto ci process script
 
 on:
   push:
