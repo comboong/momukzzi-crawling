@@ -66,6 +66,7 @@ export class GetShopInfoService {
       return { menuList: menuList, menuImg: menuImg };
     } catch (error) {
       console.log('오류 발생:', error);
+      console.log('!!');
     } finally {
       await browser.close();
     }
