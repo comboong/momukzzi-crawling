@@ -68,6 +68,7 @@ export class GetShopInfoService {
       console.log('오류 발생:', error);
       console.log('!!');
       console.log('!!');
+      console.log('!!');
     } finally {
       await browser.close();
     }
