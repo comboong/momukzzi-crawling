@@ -12,7 +12,7 @@ export class CrawlingService {
 
   async crawShopInfo(shopInfo: ShopInfo[]): Promise<shopInfoWithCrawling[]> {
     const result = [];
-
+    ß;
     process.setMaxListeners(20);
 
     const shoplist: shopInfoWithCrawling[] = await Promise.all(
