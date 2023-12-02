@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
 import { checkMenuClassName } from './checkMenuClassName.service';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class GetShopInfoService {
-  async crawShopInfo(shopUrl: string): Promise<any> {
+  async crawShopInfo(
+    shopUrl: string,
+  ): Promise<{ menuInfo: [string, number][]; menuImgUrl: string[] }> {
     const browser = await puppeteer.launch({ headless: true });
 
     try {
@@ -15,8 +18,11 @@ export class GetShopInfoService {
       await page.goto(shopUrl, {
         waitUntil: 'networkidle0',
       });
+
       // 메뉴 정보 크롤링
-      const webMenuList = await page.$$('#mArticle > div.cont_menu > ul > li');
+      const webMenuList = await page.$$(
+        '#mArticle > div.cont_menu > ul.list_menu > li',
+      );
 
       const menuList: [string, number][] = [];
       const menuImg: string[] = [];
@@ -25,7 +31,6 @@ export class GetShopInfoService {
         //class name 불일치로 인한 예외처리
         const classType = await menu.evaluate((el) => el.getAttribute('class'));
         const checkMenuClass = checkMenuClassName(classType); //classname이 일치하는지 여부 판단하는 함수
-
         if (!checkMenuClass) continue;
         //메뉴 이름
         const menuName = await menu.$eval(
@@ -34,11 +39,15 @@ export class GetShopInfoService {
         );
 
         //메뉴 가격
-        const menuPirce = await menu
-          .$eval('div.info_menu > em.price_menu', (data) => data.textContent)
-          .then((x) => Number(x.replace('가격: ', '').replace(',', '')));
+        try {
+          const menuPirce = await menu
+            .$eval('div.info_menu > em.price_menu', (data) => data.textContent)
+            .then((x) => Number(x.replace('가격: ', '').replace(',', '')));
 
-        menuList.push([menuName, menuPirce]);
+          menuList.push([menuName, menuPirce]);
+        } catch {
+          menuList.push([menuName, null]);
+        }
       }
 
       // 음식 사진 크롤링
@@ -63,12 +72,10 @@ export class GetShopInfoService {
         }
       }
 
-      return { menuList: menuList, menuImg: menuImg };
+      return { menuInfo: menuList, menuImgUrl: menuImg };
     } catch (error) {
       console.log('오류 발생:', error);
-      console.log('!!');
-      console.log('!!');
-      console.log('!!');
+      throw new BadRequestException();
     } finally {
       await browser.close();
     }

@@ -11,15 +11,29 @@ export class CrawlingService {
   constructor(private getShopInfo: GetShopInfoService) {}
 
   async crawShopInfo(shopInfo: ShopInfo[]): Promise<shopInfoWithCrawling[]> {
+    const result = [];
+
     process.setMaxListeners(20);
-    const responce: shopInfoWithCrawling[] = await Promise.all(
+
+    const shoplist: shopInfoWithCrawling[] = await Promise.all(
       shopInfo.map(async (shop) => {
-        const crawlingInfo: CrawedShopInfo =
-          await this.getShopInfo.crawShopInfo(shop.place_url);
-        return { ...shop, ...crawlingInfo };
+        try {
+          const crawlingInfo: CrawedShopInfo =
+            await this.getShopInfo.crawShopInfo(shop.place_url);
+
+          return { ...shop, ...crawlingInfo };
+        } catch {
+          return;
+        }
       }),
     );
 
-    return responce;
+    for (const shop of shoplist) {
+      if (shop !== undefined) {
+        result.push(shop);
+      }
+    }
+
+    return result;
   }
 }
