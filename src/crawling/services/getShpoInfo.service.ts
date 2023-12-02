@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as puppeteer from 'puppeteer';
 import { checkMenuClassName } from './checkMenuClassName.service';
-import { throwError } from 'rxjs';
 
 @Injectable()
 export class GetShopInfoService {
