@@ -8,7 +8,6 @@ export class GetShopInfoService {
     shopUrl: string,
   ): Promise<{ menuInfo: [string, number][]; menuImgUrl: string[] }> {
     const browser = await puppeteer.launch({ headless: true });
-
     try {
       // 새로운 페이지 열기
       const page = await browser.newPage();

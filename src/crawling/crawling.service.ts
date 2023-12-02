@@ -9,12 +9,9 @@ import {
 @Injectable()
 export class CrawlingService {
   constructor(private getShopInfo: GetShopInfoService) {}
-
   async crawShopInfo(shopInfo: ShopInfo[]): Promise<shopInfoWithCrawling[]> {
     const result = [];
-
     process.setMaxListeners(20);
-
     const shoplist: shopInfoWithCrawling[] = await Promise.all(
       shopInfo.map(async (shop) => {
         try {
